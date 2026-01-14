@@ -1,4 +1,5 @@
 import io
+import sys
 import zipfile
 import requests
 import pandas as pd
@@ -23,10 +24,19 @@ BOROCODE_MAP = {
 }
 
 
-def download_and_extract_csv(url):
+def download_and_extract_csv(url, retries=3, timeout=30):
     """Download ZIP file and extract the CSV inside."""
-    response = requests.get(url)
-    response.raise_for_status()
+    for attempt in range(retries):
+        try:
+            response = requests.get(url, timeout=timeout)
+            response.raise_for_status()
+            break
+        except requests.RequestException as e:
+            if attempt < retries - 1:
+                print(f"Attempt {attempt + 1} failed: {e}. Retrying...")
+            else:
+                print(f"Failed to download {url} after {retries} attempts: {e}")
+                sys.exit(1)
 
     with zipfile.ZipFile(io.BytesIO(response.content)) as z:
         csv_filename = z.namelist()[0]
