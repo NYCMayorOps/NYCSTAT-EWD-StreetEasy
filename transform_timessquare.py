@@ -16,18 +16,18 @@ MONTH_MAP = {
 # Baseline values (April 2019 - March 2020)
 # Months 4-12 use 2019 values, months 1-3 use 2020 values
 BASELINE = {
-    1: 9403463,    # January 2020
-    2: 9599746,    # February 2020
-    3: 302374,     # March 2020
-    4: 11256708,   # April 2019
-    5: 11642886,   # May 2019
-    6: 11836655,   # June 2019
-    7: 12515144,   # July 2019
-    8: 12529524,   # August 2019
-    9: 11334376,   # September 2019
-    10: 11367532,  # October 2019
-    11: 10135928,  # November 2019
-    12: 10559750,  # December 2019
+    1: 303337.5161,   # January 2020
+    2: 331025.7241,   # February 2020
+    3: 302374,        # March 2020
+    4: 375223.6,      # April 2019
+    5: 375576.9677,   # May 2019
+    6: 394555.1667,   # June 2019
+    7: 403714.3226,   # July 2019
+    8: 404178.1935,   # August 2019
+    9: 377812.5333,   # September 2019
+    10: 366694.5806,  # October 2019
+    11: 337864.2667,  # November 2019
+    12: 340637.0968,  # December 2019
 }
 
 # Fixed SPID value
