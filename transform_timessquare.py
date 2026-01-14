@@ -8,10 +8,30 @@ INFOGRAM_URL = "https://e.infogram.com/4f23de5e-61de-4702-96f8-ab86d5e8bb2b"
 
 # Month name to number mapping
 MONTH_MAP = {
-    "January": "01", "February": "02", "March": "03", "April": "04",
-    "May": "05", "June": "06", "July": "07", "August": "08",
-    "September": "09", "October": "10", "November": "11", "December": "12",
+    "January": 1, "February": 2, "March": 3, "April": 4,
+    "May": 5, "June": 6, "July": 7, "August": 8,
+    "September": 9, "October": 10, "November": 11, "December": 12,
 }
+
+# Baseline values (April 2019 - March 2020)
+# Months 4-12 use 2019 values, months 1-3 use 2020 values
+BASELINE = {
+    1: 9403463,    # January 2020
+    2: 9599746,    # February 2020
+    3: 302374,     # March 2020
+    4: 11256708,   # April 2019
+    5: 11642886,   # May 2019
+    6: 11836655,   # June 2019
+    7: 12515144,   # July 2019
+    8: 12529524,   # August 2019
+    9: 11334376,   # September 2019
+    10: 11367532,  # October 2019
+    11: 10135928,  # November 2019
+    12: 10559750,  # December 2019
+}
+
+# Fixed SPID value
+SPID = 35
 
 
 def download_and_parse(url, retries=3, timeout=30):
@@ -51,9 +71,9 @@ def extract_chart_data(data):
 
 
 def transform_to_long(table):
-    """Transform wide table to long format with YYYYMM month column."""
+    """Transform wide table to new format with 5 columns."""
     # Extract years from header row
-    years = [cell["value"] for cell in table[0][1:]]
+    years = [int(cell["value"]) for cell in table[0][1:]]
 
     rows = []
     for row in table[1:]:
@@ -64,12 +84,18 @@ def transform_to_long(table):
 
         for i, year in enumerate(years):
             if i + 1 < len(row):
-                value = row[i + 1]["value"].strip().replace(",", "").replace(" ", "")
-                if value:
-                    rows.append((f"{year}{month_num}", int(value)))
+                value_str = row[i + 1]["value"].strip().replace(",", "").replace(" ", "")
+                if value_str:
+                    value = int(value_str)
+                    # Format: M/1/YYYY
+                    date_str = f"{month_num}/1/{year}"
+                    baseline = BASELINE.get(month_num, 0)
+                    # Calculate percent change: Value / PseudoBaseline
+                    pct_chg = round(value / baseline, 4) if baseline else ""
+                    rows.append((year, month_num, date_str, value, baseline, pct_chg))
 
-    # Sort by month descending
-    rows.sort(key=lambda x: x[0], reverse=True)
+    # Sort by year desc, then month desc
+    rows.sort(key=lambda x: (x[0], x[1]), reverse=True)
     return rows
 
 
@@ -86,9 +112,9 @@ def main():
     # Save to CSV
     output_path = "data/timessquare_pedestrian.csv"
     with open(output_path, "w") as f:
-        f.write("Month,Count\n")
-        for month, count in rows:
-            f.write(f"{month},{count}\n")
+        f.write("date.1,Value,SPID,PseudoBaseline,Baseline Perc Chg\n")
+        for year, month_num, date_str, value, baseline, pct_chg in rows:
+            f.write(f"{date_str},{value},{SPID},{baseline},{pct_chg}\n")
 
     print(f"Saved to {output_path}")
     print(f"Total rows: {len(rows)}")
