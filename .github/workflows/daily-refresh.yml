@@ -2,7 +2,7 @@ name: Daily Data Refresh
 
 on:
   schedule:
-    - cron: '0 6 * * *'  # 6:00 AM UTC daily
+    - cron: '0 7 * * *'  # 7:00 AM UTC (2am New York EST / 3am EDT)
   workflow_dispatch:      # Manual trigger
 
 jobs:
