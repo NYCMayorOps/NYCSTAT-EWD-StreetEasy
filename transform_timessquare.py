@@ -83,7 +83,7 @@ def transform_to_long(table):
             continue
 
         for i, year in enumerate(years):
-            if i + 1 < len(row):
+            if i + 1 < len(row) and row[i + 1] is not None:
                 value_str = row[i + 1]["value"].strip().replace(",", "").replace(" ", "")
                 if value_str:
                     value = int(value_str)
